@@ -1,0 +1,111 @@
+#pragma once
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include <ButtonModuleInterface.hpp>
+#include <RelayModuleInterface.hpp>
+
+#include "BlindAccessoryInterface.hpp"
+
+/**
+ * @brief Class representing a blind accessory.
+ */
+class BlindAccessory : public BlindAccessoryInterface
+{
+public:
+    /**
+     * @brief Constructor for BlindAccessory.
+     *
+     * @param motorUp Pointer to the relay module interface for moving the blind up.
+     * @param motorDown Pointer to the relay module interface for moving the blind down.
+     * @param buttonUp Pointer to the button module interface for the up button.
+     * @param buttonDown Pointer to the button module interface for the down button.
+     * @param timeToOpen Time in seconds to fully open the blind.
+     * @param timeToClose Time in seconds to fully close the blind.
+     */
+    BlindAccessory(RelayModuleInterface * motorUp, RelayModuleInterface * motorDown, ButtonModuleInterface * buttonUp,
+                   ButtonModuleInterface * buttonDown, uint8_t timeToOpen = 30, uint8_t timeToClose = 30);
+
+    /**
+     * @brief Destructor for BlindAccessory.
+     */
+    ~BlindAccessory();
+
+    /**
+     * @brief Moves the blind to the specified position.
+     *
+     * @param newPosition The desired position to move the blind to.
+     */
+    void moveBlindTo(uint8_t newPosition) override;
+
+    /**
+     * @brief Gets the current position of the blind.
+     *
+     * @return The current position of the blind.
+     */
+    uint8_t getCurrentPosition() override;
+
+    /**
+     * @brief Gets the target position of the blind.
+     *
+     * @return The target position of the blind.
+     */
+    uint8_t getTargetPosition() override;
+
+    /**
+     * @brief Sets the callback function for reporting to the application.
+     *
+     * @param callback The callback function.
+     * @param callbackParam Optional parameter for the callback function.
+     */
+    void setReportCallback(ReportCallback callback, CallbackParam * callbackParam = nullptr) override;
+
+    /**
+     * @brief Identifies the blind accessory.
+     */
+    void identify() override;
+
+private:
+    /**
+     * @brief Function called when the down button is pressed.
+     *
+     * @param self Pointer to the instance of the class.
+     */
+    static void buttonDownFunction(void * self);
+
+    /**
+     * @brief Function called when the up button is pressed.
+     *
+     * @param self Pointer to the instance of the class.
+     */
+    static void buttonUpFunction(void * self);
+
+    void startMoveUp();
+    void startMoveDown();
+    void stopMove();
+
+    /**
+     * @brief Task to move the blind to the target position.
+     *
+     * @param self Pointer to the instance of the class.
+     */
+    static void moveBlindToTargetTask(void * self);
+
+    bool targetPositionReached(bool movingUp);
+
+    RelayModuleInterface * m_motorUp;     ///< Pointer to the relay module for moving the blind up.
+    RelayModuleInterface * m_motorDown;   ///< Pointer to the relay module for moving the blind down.
+    ButtonModuleInterface * m_buttonUp;   ///< Pointer to the button module for the up button.
+    ButtonModuleInterface * m_buttonDown; ///< Pointer to the button module for the down button.
+    uint8_t m_timeToOpen;                 ///< Time in seconds to fully open the blind.
+    uint8_t m_timeToClose;                ///< Time in seconds to fully close the blind.
+    uint8_t m_blindPosition;              ///< Current position of the blind.
+    uint8_t m_targetPosition;             ///< Target position of the blind.
+    TaskHandle_t m_moveBlindTaskHandle;   ///< Task handle for the move blind task.
+
+    ReportCallback m_reportAttributesCallback;           ///< Callback function for reporting attributes.
+    CallbackParam * m_reportAttributesCallbackParameter; ///< Parameter to be passed to the callback function.
+
+    static constexpr const char * TAG = "BlindAccessory"; ///< Log tag
+};
