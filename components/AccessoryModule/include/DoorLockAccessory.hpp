@@ -61,7 +61,7 @@ private:
      *
      * @param self Pointer to the DoorLockAccessory instance.
      */
-    static void buttonFunction(void * self);
+    static void buttonCallback(void * self);
 
     void openDoor();
     static void openDoorTask(void * pvParameters);
@@ -72,6 +72,6 @@ private:
     uint8_t m_openTime;                     ///< Time in seconds to keep the door open.
     TaskHandle_t m_openDoorTaskHandle;      ///< Task handle for the open door task.
 
-    ReportCallback m_reportAttributesCallback;           ///< Callback function for reporting attributes.
-    CallbackParam * m_reportAttributesCallbackParameter; ///< Parameter to be passed to the callback function.
+    ReportCallback m_reportCallback;       ///< Callback function for reporting attributes.
+    CallbackParam * m_reportCallbackParam; ///< Parameter to be passed to the callback function.
 };

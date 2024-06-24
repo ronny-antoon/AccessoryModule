@@ -56,7 +56,7 @@ private:
      *
      * @param self Pointer to the instance of the class.
      */
-    static void buttonFunction(void * self);
+    static void buttonCallback(void * self);
 
     RelayModuleInterface * m_relayModule;   ///< Pointer to the relay module interface.
     ButtonModuleInterface * m_buttonModule; ///< Pointer to the button module interface.

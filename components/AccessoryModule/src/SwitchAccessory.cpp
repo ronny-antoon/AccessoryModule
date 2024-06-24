@@ -10,7 +10,7 @@ SwitchAccessory::SwitchAccessory(RelayModuleInterface * relayModule, ButtonModul
     m_relayModule(relayModule), m_buttonModule(buttonModule)
 {
     ESP_LOGI(TAG, "SwitchAccessory created");
-    m_buttonModule->onSinglePress(buttonFunction, this);
+    m_buttonModule->setSinglePressCallback(buttonCallback, this);
 }
 
 SwitchAccessory::~SwitchAccessory()
@@ -56,7 +56,6 @@ void SwitchAccessory::setReportCallback(ReportCallback callback, CallbackParam *
 void SwitchAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying SwitchAccessory");
-    // Run task for 3 seconds to blink the LED
     xTaskCreate(
         [](void * self) {
             ESP_LOGD(TAG, "Starting identification sequence");
@@ -77,14 +76,12 @@ void SwitchAccessory::identify()
             switchAccessory->setPower(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
-
-            // Delete the task
             vTaskDelete(nullptr);
         },
         "identify", 2048, this, 5, nullptr);
 }
 
-void SwitchAccessory::buttonFunction(void * self)
+void SwitchAccessory::buttonCallback(void * self)
 {
     SwitchAccessory * switchAccessory = static_cast<SwitchAccessory *>(self);
     bool newPowerState                = !switchAccessory->getPower();

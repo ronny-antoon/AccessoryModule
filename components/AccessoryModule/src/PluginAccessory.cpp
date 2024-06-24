@@ -10,7 +10,7 @@ PluginAccessory::PluginAccessory(RelayModuleInterface * relayModule, ButtonModul
     m_relayModule(relayModule), m_buttonModule(buttonModule)
 {
     ESP_LOGI(TAG, "PluginAccessory created");
-    m_buttonModule->onSinglePress(buttonFunction, this);
+    m_buttonModule->setSinglePressCallback(buttonCallback, this);
 }
 
 PluginAccessory::~PluginAccessory()
@@ -56,7 +56,6 @@ void PluginAccessory::setReportCallback(ReportCallback callback, CallbackParam *
 void PluginAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying PluginAccessory");
-    // Run task for 3 seconds to blink the LED
     xTaskCreate(
         [](void * self) {
             ESP_LOGD(TAG, "Starting identification sequence");
@@ -77,14 +76,12 @@ void PluginAccessory::identify()
             pluginAccessory->setPower(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
-
-            // Delete the task
             vTaskDelete(nullptr);
         },
         "identify", 2048, this, 5, nullptr);
 }
 
-void PluginAccessory::buttonFunction(void * self)
+void PluginAccessory::buttonCallback(void * self)
 {
     PluginAccessory * pluginAccessory = static_cast<PluginAccessory *>(self);
     bool newPowerState                = !pluginAccessory->getPower();

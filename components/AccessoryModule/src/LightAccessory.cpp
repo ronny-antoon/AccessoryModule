@@ -6,11 +6,11 @@
 
 static const char * TAG = "LightAccessory";
 
-LightAccessory::LightAccessory(RelayModuleInterface * relayModuleInterface, ButtonModuleInterface * buttonModuleInterface) :
-    m_relayModuleInterface(relayModuleInterface), m_buttonModuleInterface(buttonModuleInterface)
+LightAccessory::LightAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule) :
+    m_relayModule(relayModule), m_buttonModule(buttonModule)
 {
     ESP_LOGI(TAG, "LightAccessory created");
-    m_buttonModuleInterface->onSinglePress(buttonCallback, this);
+    m_buttonModule->setSinglePressCallback(buttonCallback, this);
 }
 
 LightAccessory::~LightAccessory()
@@ -21,27 +21,27 @@ LightAccessory::~LightAccessory()
 void LightAccessory::setPowerState(bool powerState)
 {
     ESP_LOGI(TAG, "Setting power to %s", powerState ? "ON" : "OFF");
-    if (m_relayModuleInterface)
+    if (m_relayModule)
     {
-        m_relayModuleInterface->setPower(powerState);
+        m_relayModule->setPower(powerState);
     }
     else
     {
-        ESP_LOGW(TAG, "setPowerState called, but m_relayModuleInterface is nullptr");
+        ESP_LOGW(TAG, "setPowerState called, but m_relayModule is nullptr");
     }
 }
 
 bool LightAccessory::isPowerOn()
 {
-    if (m_relayModuleInterface)
+    if (m_relayModule)
     {
-        bool powerState = m_relayModuleInterface->isOn();
+        bool powerState = m_relayModule->isOn();
         ESP_LOGI(TAG, "Getting power state: %s", powerState ? "ON" : "OFF");
         return powerState;
     }
     else
     {
-        ESP_LOGW(TAG, "isPowerOn called, but m_relayModuleInterface is nullptr");
+        ESP_LOGW(TAG, "isPowerOn called, but m_relayModule is nullptr");
         return false;
     }
 }
@@ -56,7 +56,6 @@ void LightAccessory::setReportCallback(ReportCallback callback, CallbackParam * 
 void LightAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying LightAccessory");
-    // Run task for 3 seconds to blink the LED
     xTaskCreate(
         [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
@@ -77,8 +76,6 @@ void LightAccessory::identify()
             lightAccessory->setPowerState(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
-
-            // Delete the task
             vTaskDelete(nullptr);
         },
         "identify", 2048, this, 5, nullptr);
@@ -87,10 +84,10 @@ void LightAccessory::identify()
 void LightAccessory::buttonCallback(void * instance)
 {
     LightAccessory * lightAccessory = static_cast<LightAccessory *>(instance);
-    bool newState                   = !lightAccessory->isPowerOn();
-    ESP_LOGI(TAG, "Button pressed, toggling power to %s", newState ? "ON" : "OFF");
+    bool newPowerState              = !lightAccessory->isPowerOn();
+    ESP_LOGI(TAG, "Button pressed, toggling power to %s", newPowerState ? "ON" : "OFF");
 
-    lightAccessory->setPowerState(newState);
+    lightAccessory->setPowerState(newPowerState);
     if (lightAccessory->m_reportCallback)
     {
         ESP_LOGD(TAG, "Invoking report callback");

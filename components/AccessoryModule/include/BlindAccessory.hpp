@@ -70,16 +70,16 @@ private:
     /**
      * @brief Function called when the down button is pressed.
      *
-     * @param self Pointer to the instance of the class.
+     * @param instance Pointer to the instance of the class.
      */
-    static void buttonDownFunction(void * self);
+    static void buttonDownCallback(void * instance);
 
     /**
      * @brief Function called when the up button is pressed.
      *
-     * @param self Pointer to the instance of the class.
+     * @param instance Pointer to the instance of the class.
      */
-    static void buttonUpFunction(void * self);
+    static void buttonUpCallback(void * instance);
 
     void startMoveUp();
     void startMoveDown();
@@ -88,9 +88,9 @@ private:
     /**
      * @brief Task to move the blind to the target position.
      *
-     * @param self Pointer to the instance of the class.
+     * @param instance Pointer to the instance of the class.
      */
-    static void moveBlindToTargetTask(void * self);
+    static void moveBlindToTargetTask(void * instance);
 
     bool targetPositionReached(bool movingUp);
 
@@ -104,8 +104,6 @@ private:
     uint8_t m_targetPosition;             ///< Target position of the blind.
     TaskHandle_t m_moveBlindTaskHandle;   ///< Task handle for the move blind task.
 
-    ReportCallback m_reportAttributesCallback;           ///< Callback function for reporting attributes.
-    CallbackParam * m_reportAttributesCallbackParameter; ///< Parameter to be passed to the callback function.
-
-    static constexpr const char * TAG = "BlindAccessory"; ///< Log tag
+    ReportCallback m_reportCallback;       ///< Callback function for reporting attributes.
+    CallbackParam * m_reportCallbackParam; ///< Parameter to be passed to the callback function.
 };

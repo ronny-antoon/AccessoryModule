@@ -46,6 +46,15 @@ private:
     ButtonModuleInterface * m_buttonModule; ///< Pointer to the button module interface.
     PressType m_lastPressType;              ///< Stores the type of the last press.
 
-    ReportCallback m_reportAttributesCallback;           ///< Callback function for reporting.
-    CallbackParam * m_reportAttributesCallbackParameter; ///< Parameter for the callback function.
+    ReportCallback m_reportCallback;       ///< Callback function for reporting.
+    CallbackParam * m_reportCallbackParam; ///< Parameter for the callback function.
+
+    /**
+     * @brief Handles the button press.
+     *
+     * @param self Pointer to the StatelessButtonAccessory object.
+     * @param pressType The type of the press.
+     * @param logMessage The message to log.
+     */
+    static void handlePress(void * self, PressType pressType, const char * logMessage);
 };

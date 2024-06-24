@@ -10,40 +10,16 @@ StatelessButtonAccessory::StatelessButtonAccessory(ButtonModuleInterface * butto
 {
     ESP_LOGI(TAG, "StatelessButtonAccessory created");
 
-    m_buttonModule->onSinglePress(
-        [](void * self) {
-            StatelessButtonAccessory * statelessButtonAccessory = static_cast<StatelessButtonAccessory *>(self);
-            statelessButtonAccessory->m_lastPressType           = StatelessButtonAccessoryInterface::PressType::SinglePress;
-            ESP_LOGI(TAG, "Single press detected");
-            if (statelessButtonAccessory->m_reportCallback)
-            {
-                statelessButtonAccessory->m_reportCallback(statelessButtonAccessory->m_reportCallbackParam);
-            }
-        },
+    m_buttonModule->setSinglePressCallback(
+        [](void * self) { handlePress(self, StatelessButtonAccessoryInterface::PressType::SinglePress, "Single press detected"); },
         this);
 
-    m_buttonModule->onDoublePress(
-        [](void * self) {
-            StatelessButtonAccessory * statelessButtonAccessory = static_cast<StatelessButtonAccessory *>(self);
-            statelessButtonAccessory->m_lastPressType           = StatelessButtonAccessoryInterface::PressType::DoublePress;
-            ESP_LOGI(TAG, "Double press detected");
-            if (statelessButtonAccessory->m_reportCallback)
-            {
-                statelessButtonAccessory->m_reportCallback(statelessButtonAccessory->m_reportCallbackParam);
-            }
-        },
+    m_buttonModule->setDoublePressCallback(
+        [](void * self) { handlePress(self, StatelessButtonAccessoryInterface::PressType::DoublePress, "Double press detected"); },
         this);
 
-    m_buttonModule->onLongPress(
-        [](void * self) {
-            StatelessButtonAccessory * statelessButtonAccessory = static_cast<StatelessButtonAccessory *>(self);
-            statelessButtonAccessory->m_lastPressType           = StatelessButtonAccessoryInterface::PressType::LongPress;
-            ESP_LOGI(TAG, "Long press detected");
-            if (statelessButtonAccessory->m_reportCallback)
-            {
-                statelessButtonAccessory->m_reportCallback(statelessButtonAccessory->m_reportCallbackParam);
-            }
-        },
+    m_buttonModule->setLongPressCallback(
+        [](void * self) { handlePress(self, StatelessButtonAccessoryInterface::PressType::LongPress, "Long press detected"); },
         this);
 }
 
@@ -69,4 +45,16 @@ StatelessButtonAccessoryInterface::PressType StatelessButtonAccessory::getLastPr
 {
     ESP_LOGI(TAG, "Getting last press type: %d", m_lastPressType);
     return m_lastPressType;
+}
+
+void StatelessButtonAccessory::handlePress(void * self, StatelessButtonAccessoryInterface::PressType pressType,
+                                           const char * logMessage)
+{
+    StatelessButtonAccessory * statelessButtonAccessory = static_cast<StatelessButtonAccessory *>(self);
+    statelessButtonAccessory->m_lastPressType           = pressType;
+    ESP_LOGI(TAG, "%s", logMessage);
+    if (statelessButtonAccessory->m_reportCallback)
+    {
+        statelessButtonAccessory->m_reportCallback(statelessButtonAccessory->m_reportCallbackParam);
+    }
 }

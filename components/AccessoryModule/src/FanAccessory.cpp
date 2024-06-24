@@ -9,7 +9,7 @@ FanAccessory::FanAccessory(RelayModuleInterface * relayModule, ButtonModuleInter
     m_relayModule(relayModule), m_buttonModule(buttonModule)
 {
     ESP_LOGI(TAG, "FanAccessory created");
-    m_buttonModule->onSinglePress(buttonFunction, this);
+    m_buttonModule->setSinglePressCallback(buttonCallback, this);
 }
 
 FanAccessory::~FanAccessory()
@@ -48,45 +48,48 @@ bool FanAccessory::getPower()
 void FanAccessory::setReportCallback(ReportCallback callback, CallbackParam * callbackParam)
 {
     ESP_LOGI(TAG, "Setting report callback");
-    m_reportAttributesCallback          = callback;
-    m_reportAttributesCallbackParameter = callbackParam;
+    m_reportCallback      = callback;
+    m_reportCallbackParam = callbackParam;
 }
 
 void FanAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying FanAccessory");
-    // Run task for 3 seconds to blink the LED
     xTaskCreate(
-        [](void * self) {
+        [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
-            FanAccessory * fanAccessory = static_cast<FanAccessory *>(self);
+            FanAccessory * fanAccessory = static_cast<FanAccessory *>(instance);
+
             fanAccessory->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
+
             fanAccessory->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
+
             fanAccessory->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
+
             fanAccessory->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
+
             fanAccessory->setPower(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
-            // Delete the task
             vTaskDelete(nullptr);
         },
         "identify", 2048, this, 5, nullptr);
 }
 
-void FanAccessory::buttonFunction(void * self)
+void FanAccessory::buttonCallback(void * instance)
 {
-    FanAccessory * fanAccessory = static_cast<FanAccessory *>(self);
+    FanAccessory * fanAccessory = static_cast<FanAccessory *>(instance);
     bool newPowerState          = !fanAccessory->getPower();
     ESP_LOGI(TAG, "Button pressed, toggling power to %s", newPowerState ? "ON" : "OFF");
 
     fanAccessory->setPower(newPowerState);
-    if (fanAccessory->m_reportAttributesCallback)
+    if (fanAccessory->m_reportCallback)
     {
         ESP_LOGD(TAG, "Invoking report callback");
-        fanAccessory->m_reportAttributesCallback(fanAccessory->m_reportAttributesCallbackParameter);
+        fanAccessory->m_reportCallback(fanAccessory->m_reportCallbackParam);
     }
 }

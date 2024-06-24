@@ -59,8 +59,8 @@ private:
      */
     static void buttonCallback(void * instance);
 
-    RelayModuleInterface * m_relayModuleInterface;   ///< Pointer to the relay module interface.
-    ButtonModuleInterface * m_buttonModuleInterface; ///< Pointer to the button module interface.
+    RelayModuleInterface * m_relayModule;   ///< Pointer to the relay module interface.
+    ButtonModuleInterface * m_buttonModule; ///< Pointer to the button module interface.
 
     ReportCallback m_reportCallback;       ///< Callback function for reporting attributes.
     CallbackParam * m_reportCallbackParam; ///< Parameter to be passed to the callback function.
