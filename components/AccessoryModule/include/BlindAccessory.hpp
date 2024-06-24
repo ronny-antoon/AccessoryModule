@@ -66,6 +66,8 @@ public:
      */
     void identify() override;
 
+    void setDefaultPosition(uint8_t defaultPosition) override;
+
 private:
     /**
      * @brief Function called when the down button is pressed.

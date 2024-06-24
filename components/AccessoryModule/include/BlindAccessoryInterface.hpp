@@ -46,4 +46,6 @@ public:
      * @brief Identifies the blind accessory.
      */
     virtual void identify() override = 0;
+
+    virtual void setDefaultPosition(uint8_t defaultPosition) = 0;
 };

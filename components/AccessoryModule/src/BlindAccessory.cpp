@@ -214,3 +214,9 @@ bool BlindAccessory::targetPositionReached(bool movingUp)
         return m_blindPosition <= m_targetPosition;
     }
 }
+
+void BlindAccessory::setDefaultPosition(uint8_t defaultPosition)
+{
+    ESP_LOGI(TAG, "setDefaultPosition called with defaultPosition: %d", defaultPosition);
+    m_blindPosition = defaultPosition;
+}
