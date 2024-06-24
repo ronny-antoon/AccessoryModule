@@ -1,12 +1,12 @@
 dependencies:
   idf:
-    version: '5.2.1'
+    version: '5.1.2'
     require: "public"
-  ronny-antoon/RelayButtonModule:
-    version: '1.0.0'
+  ronny-antoon/relaybuttonmodule:
+    version: '1.0.1'
     require: "public"
 description: 'The `AccessoryModule` provides a set of classes and interfaces for managing various accessories.'
 repository: 'https://github.com/ronny-antoon/AccessoryModule/tree/v1.0.0'
 url: 'https://github.com/ronny-antoon/AccessoryModule/tree/v1.0.0'
 license: MIT
-version: 1.0.0
+version: 1.0.1
