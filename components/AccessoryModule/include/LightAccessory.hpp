@@ -14,10 +14,10 @@ public:
     /**
      * @brief Constructs a LightAccessory object.
      *
-     * @param relayModuleInterface Pointer to the relay module.
-     * @param buttonModuleInterface Pointer to the button module.
+     * @param relayModule Pointer to the relay module.
+     * @param buttonModule Pointer to the button module.
      */
-    LightAccessory(RelayModuleInterface * relayModuleInterface, ButtonModuleInterface * buttonModuleInterface);
+    LightAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule);
 
     /**
      * @brief Destructor for LightAccessory.
@@ -64,4 +64,8 @@ private:
 
     ReportCallback m_reportCallback;       ///< Callback function for reporting attributes.
     CallbackParam * m_reportCallbackParam; ///< Parameter to be passed to the callback function.
+
+    // Delete copy constructor and assignment operator
+    LightAccessory(const LightAccessory &)             = delete;
+    LightAccessory & operator=(const LightAccessory &) = delete;
 };

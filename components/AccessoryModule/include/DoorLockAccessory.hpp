@@ -19,9 +19,9 @@ public:
      *
      * @param relayModule Pointer to the relay module interface.
      * @param buttonModule Pointer to the button module interface.
-     * @param openTime Time in seconds to keep the door open.
+     * @param openDuration Time in seconds to keep the door open.
      */
-    DoorLockAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule, uint8_t openTime = 5);
+    DoorLockAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule, uint8_t openDuration = 5);
 
     /**
      * @brief Destructor for DoorLockAccessory.
@@ -59,9 +59,9 @@ private:
     /**
      * @brief Static function to handle button press.
      *
-     * @param self Pointer to the DoorLockAccessory instance.
+     * @param instance Pointer to the DoorLockAccessory instance.
      */
-    static void buttonCallback(void * self);
+    static void buttonCallback(void * instance);
 
     void openDoor();
     static void openDoorTask(void * pvParameters);
@@ -69,9 +69,13 @@ private:
 
     RelayModuleInterface * m_relayModule;   ///< Pointer to the relay module.
     ButtonModuleInterface * m_buttonModule; ///< Pointer to the button module.
-    uint8_t m_openTime;                     ///< Time in seconds to keep the door open.
+    uint8_t m_openDuration;                 ///< Time in seconds to keep the door open.
     TaskHandle_t m_openDoorTaskHandle;      ///< Task handle for the open door task.
 
     ReportCallback m_reportCallback;       ///< Callback function for reporting attributes.
     CallbackParam * m_reportCallbackParam; ///< Parameter to be passed to the callback function.
+
+    // Delete copy constructor and assignment operator
+    DoorLockAccessory(const DoorLockAccessory &)             = delete;
+    DoorLockAccessory & operator=(const DoorLockAccessory &) = delete;
 };

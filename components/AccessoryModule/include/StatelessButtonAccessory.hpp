@@ -52,9 +52,13 @@ private:
     /**
      * @brief Handles the button press.
      *
-     * @param self Pointer to the StatelessButtonAccessory object.
+     * @param instance Pointer to the StatelessButtonAccessory object.
      * @param pressType The type of the press.
      * @param logMessage The message to log.
      */
-    static void handlePress(void * self, PressType pressType, const char * logMessage);
+    static void handlePress(void * instance, PressType pressType, const char * logMessage);
+
+    // Delete the copy constructor and assignment operator
+    StatelessButtonAccessory(const StatelessButtonAccessory &)             = delete;
+    StatelessButtonAccessory & operator=(const StatelessButtonAccessory &) = delete;
 };

@@ -6,8 +6,9 @@
 
 static const char * TAG = "DoorLockAccessory";
 
-DoorLockAccessory::DoorLockAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule, uint8_t openTime) :
-    m_relayModule(relayModule), m_buttonModule(buttonModule), m_openTime(openTime), m_openDoorTaskHandle(nullptr)
+DoorLockAccessory::DoorLockAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule,
+                                     uint8_t openDuration) :
+    m_relayModule(relayModule), m_buttonModule(buttonModule), m_openDuration(openDuration), m_openDoorTaskHandle(nullptr)
 {
     ESP_LOGI(TAG, "DoorLockAccessory created");
     m_buttonModule->setSinglePressCallback(buttonCallback, this);
@@ -20,6 +21,7 @@ DoorLockAccessory::~DoorLockAccessory()
 
 void DoorLockAccessory::setState(DoorLockState state)
 {
+    ESP_LOGI(TAG, "Setting state to %s", state == DoorLockState::LOCKED ? "LOCKED" : "UNLOCKED");
     if (state == DoorLockState::LOCKED)
     {
         closeDoor();
@@ -32,7 +34,9 @@ void DoorLockAccessory::setState(DoorLockState state)
 
 DoorLockAccessoryInterface::DoorLockState DoorLockAccessory::getState()
 {
-    return m_relayModule->isOn() ? DoorLockState::UNLOCKED : DoorLockState::LOCKED;
+    DoorLockState state = m_relayModule->isOn() ? DoorLockState::UNLOCKED : DoorLockState::LOCKED;
+    ESP_LOGI(TAG, "Current state is %s", state == DoorLockState::LOCKED ? "LOCKED" : "UNLOCKED");
+    return state;
 }
 
 void DoorLockAccessory::setReportCallback(ReportCallback callback, CallbackParam * callbackParam)
@@ -76,6 +80,7 @@ void DoorLockAccessory::openDoor()
 {
     if (getState() == DoorLockState::LOCKED)
     {
+        ESP_LOGI(TAG, "Opening door");
         m_relayModule->setPower(true);
         if (m_reportCallback)
         {
@@ -95,7 +100,7 @@ void DoorLockAccessory::openDoor()
 void DoorLockAccessory::openDoorTask(void * pvParameters)
 {
     DoorLockAccessory * doorLockAccessory = static_cast<DoorLockAccessory *>(pvParameters);
-    vTaskDelay(doorLockAccessory->m_openTime * 1000 / portTICK_PERIOD_MS);
+    vTaskDelay(doorLockAccessory->m_openDuration * 1000 / portTICK_PERIOD_MS);
     doorLockAccessory->closeDoor();
     doorLockAccessory->m_openDoorTaskHandle = nullptr;
     vTaskDelete(nullptr);
@@ -108,6 +113,7 @@ void DoorLockAccessory::closeDoor()
         vTaskDelete(m_openDoorTaskHandle);
         m_openDoorTaskHandle = nullptr;
     }
+    ESP_LOGI(TAG, "Closing door");
     m_relayModule->setPower(false);
     if (m_reportCallback)
     {

@@ -5,8 +5,7 @@
 /**
  * @brief Interface for plugin accessory functionalities.
  */
-class PluginAccessoryInterface : public BaseAccessoryInterface
-{
+class PluginAccessoryInterface : public BaseAccessoryInterface {
 public:
     ~PluginAccessoryInterface() = default;
 

@@ -6,11 +6,11 @@
 
 static const char * TAG = "PluginAccessory";
 
-PluginAccessory::PluginAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule) :
-    m_relayModule(relayModule), m_buttonModule(buttonModule)
+PluginAccessory::PluginAccessory(RelayModuleInterface * relayModuleInterface, ButtonModuleInterface * buttonModuleInterface) :
+    m_relayModuleInterface(relayModuleInterface), m_buttonModuleInterface(buttonModuleInterface)
 {
     ESP_LOGI(TAG, "PluginAccessory created");
-    m_buttonModule->setSinglePressCallback(buttonCallback, this);
+    m_buttonModuleInterface->setSinglePressCallback(buttonCallback, this);
 }
 
 PluginAccessory::~PluginAccessory()
@@ -21,27 +21,27 @@ PluginAccessory::~PluginAccessory()
 void PluginAccessory::setPower(bool power)
 {
     ESP_LOGI(TAG, "Setting power to %s", power ? "ON" : "OFF");
-    if (m_relayModule)
+    if (m_relayModuleInterface)
     {
-        m_relayModule->setPower(power);
+        m_relayModuleInterface->setPower(power);
     }
     else
     {
-        ESP_LOGW(TAG, "setPower called, but m_relayModule is nullptr");
+        ESP_LOGW(TAG, "setPower called, but m_relayModuleInterface is nullptr");
     }
 }
 
 bool PluginAccessory::getPower()
 {
-    if (m_relayModule)
+    if (m_relayModuleInterface)
     {
-        bool powerState = m_relayModule->isOn();
+        bool powerState = m_relayModuleInterface->isOn();
         ESP_LOGI(TAG, "Getting power state: %s", powerState ? "ON" : "OFF");
         return powerState;
     }
     else
     {
-        ESP_LOGW(TAG, "getPower called, but m_relayModule is nullptr");
+        ESP_LOGW(TAG, "getPower called, but m_relayModuleInterface is nullptr");
         return false;
     }
 }
@@ -57,9 +57,9 @@ void PluginAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying PluginAccessory");
     xTaskCreate(
-        [](void * self) {
+        [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
-            PluginAccessory * pluginAccessory = static_cast<PluginAccessory *>(self);
+            PluginAccessory * pluginAccessory = static_cast<PluginAccessory *>(instance);
 
             pluginAccessory->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -81,9 +81,9 @@ void PluginAccessory::identify()
         "identify", 2048, this, 5, nullptr);
 }
 
-void PluginAccessory::buttonCallback(void * self)
+void PluginAccessory::buttonCallback(void * instance)
 {
-    PluginAccessory * pluginAccessory = static_cast<PluginAccessory *>(self);
+    PluginAccessory * pluginAccessory = static_cast<PluginAccessory *>(instance);
     bool newPowerState                = !pluginAccessory->getPower();
     ESP_LOGI(TAG, "Button pressed, toggling power to %s", newPowerState ? "ON" : "OFF");
 

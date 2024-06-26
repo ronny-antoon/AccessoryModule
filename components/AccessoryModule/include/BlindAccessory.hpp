@@ -66,6 +66,11 @@ public:
      */
     void identify() override;
 
+    /**
+     * @brief Sets the default position of the blind.
+     *
+     * @param defaultPosition The default position of the blind.
+     */
     void setDefaultPosition(uint8_t defaultPosition) override;
 
 private:
@@ -83,8 +88,19 @@ private:
      */
     static void buttonUpCallback(void * instance);
 
+    /**
+     * @brief Starts moving the blind up.
+     */
     void startMoveUp();
+
+    /**
+     * @brief Starts moving the blind down.
+     */
     void startMoveDown();
+
+    /**
+     * @brief Stops the blind from moving.
+     */
     void stopMove();
 
     /**
@@ -94,6 +110,12 @@ private:
      */
     static void moveBlindToTargetTask(void * instance);
 
+    /**
+     * @brief Checks if the target position has been reached.
+     *
+     * @param movingUp True if the blind is moving up, false if it is moving down.
+     * @return True if the target position has been reached, false otherwise.
+     */
     bool targetPositionReached(bool movingUp);
 
     RelayModuleInterface * m_motorUp;     ///< Pointer to the relay module for moving the blind up.
@@ -108,4 +130,8 @@ private:
 
     ReportCallback m_reportCallback;       ///< Callback function for reporting attributes.
     CallbackParam * m_reportCallbackParam; ///< Parameter to be passed to the callback function.
+
+    // Delete copy constructor and assignment operator
+    BlindAccessory(const BlindAccessory &)             = delete;
+    BlindAccessory & operator=(const BlindAccessory &) = delete;
 };

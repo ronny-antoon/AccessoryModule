@@ -57,9 +57,9 @@ void SwitchAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying SwitchAccessory");
     xTaskCreate(
-        [](void * self) {
+        [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
-            SwitchAccessory * switchAccessory = static_cast<SwitchAccessory *>(self);
+            SwitchAccessory * switchAccessory = static_cast<SwitchAccessory *>(instance);
 
             switchAccessory->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -81,9 +81,9 @@ void SwitchAccessory::identify()
         "identify", 2048, this, 5, nullptr);
 }
 
-void SwitchAccessory::buttonCallback(void * self)
+void SwitchAccessory::buttonCallback(void * instance)
 {
-    SwitchAccessory * switchAccessory = static_cast<SwitchAccessory *>(self);
+    SwitchAccessory * switchAccessory = static_cast<SwitchAccessory *>(instance);
     bool newPowerState                = !switchAccessory->getPower();
     ESP_LOGI(TAG, "Button pressed, toggling power to %s", newPowerState ? "ON" : "OFF");
 

@@ -47,5 +47,10 @@ public:
      */
     virtual void identify() override = 0;
 
+    /**
+     * @brief Sets the default position of the blind.
+     *
+     * @param defaultPosition The default position of the blind.
+     */
     virtual void setDefaultPosition(uint8_t defaultPosition) = 0;
 };

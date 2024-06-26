@@ -14,10 +14,10 @@ public:
     /**
      * @brief Constructor for PluginAccessory.
      *
-     * @param relayModule Pointer to the relay module interface.
-     * @param buttonModule Pointer to the button module interface.
+     * @param relayModuleInterface Pointer to the relay module interface.
+     * @param buttonModuleInterface Pointer to the button module interface.
      */
-    PluginAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule);
+    PluginAccessory(RelayModuleInterface * relayModuleInterface, ButtonModuleInterface * buttonModuleInterface);
 
     /**
      * @brief Destructor for PluginAccessory.
@@ -55,13 +55,17 @@ private:
     /**
      * @brief Function called when the button is pressed.
      *
-     * @param self Pointer to the instance of the class.
+     * @param instance Pointer to the instance of the class.
      */
-    static void buttonCallback(void * self);
+    static void buttonCallback(void * instance);
 
-    RelayModuleInterface * m_relayModule;   ///< Pointer to the relay module interface.
-    ButtonModuleInterface * m_buttonModule; ///< Pointer to the button module interface.
+    RelayModuleInterface * m_relayModuleInterface;   ///< Pointer to the relay module interface.
+    ButtonModuleInterface * m_buttonModuleInterface; ///< Pointer to the button module interface.
 
     ReportCallback m_reportCallback;       ///< Callback function for reporting.
     CallbackParam * m_reportCallbackParam; ///< Parameter for the callback function.
+
+    // Delete the copy constructor and assignment operator.
+    PluginAccessory(const PluginAccessory &)             = delete;
+    PluginAccessory & operator=(const PluginAccessory &) = delete;
 };

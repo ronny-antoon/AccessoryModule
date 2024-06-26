@@ -9,10 +9,8 @@ BlindAccessory::BlindAccessory(RelayModuleInterface * motorUp, RelayModuleInterf
     m_timeToClose(timeToClose), m_blindPosition(0), m_targetPosition(0), m_moveBlindTaskHandle(nullptr), m_reportCallback(nullptr),
     m_reportCallbackParam(nullptr)
 {
-    ESP_LOGI(
-        TAG,
-        "Creating BlindAccessory with motorUp: %p, motorDown: %p, buttonUp: %p, buttonDown: %p, timeToOpen: %d, timeToClose: %d",
-        motorUp, motorDown, buttonUp, buttonDown, timeToOpen, timeToClose);
+    ESP_LOGI(TAG, "Creating BlindAccessory with timeToOpen: %d, timeToClose: %d", motorUp, motorDown, buttonUp, buttonDown,
+             timeToOpen, timeToClose);
 
     m_buttonUp->setSinglePressCallback(buttonUpCallback, this);
     m_buttonDown->setSinglePressCallback(buttonDownCallback, this);
@@ -58,7 +56,7 @@ uint8_t BlindAccessory::getTargetPosition()
 
 void BlindAccessory::setReportCallback(ReportCallback callback, CallbackParam * callbackParam)
 {
-    ESP_LOGI(TAG, "setReportCallback called with callback: %p, parameter: %p", callback, callbackParam);
+    ESP_LOGI(TAG, "setReportCallback called ");
     m_reportCallback      = callback;
     m_reportCallbackParam = callbackParam;
 }
@@ -69,17 +67,25 @@ void BlindAccessory::identify()
     xTaskCreate(
         [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
+
             BlindAccessory * blindAccessory = static_cast<BlindAccessory *>(instance);
             blindAccessory->m_motorUp->setPower(false);
             blindAccessory->m_motorDown->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
+            blindAccessory->m_motorDown->setPower(false);
             blindAccessory->m_motorUp->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             blindAccessory->m_motorUp->setPower(false);
+            blindAccessory->m_motorDown->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
+            blindAccessory->m_motorDown->setPower(false);
             blindAccessory->m_motorUp->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             blindAccessory->m_motorUp->setPower(false);
+            blindAccessory->m_motorDown->setPower(true);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            blindAccessory->m_motorUp->setPower(false);
+            blindAccessory->m_motorDown->setPower(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
             vTaskDelete(nullptr);
@@ -203,7 +209,7 @@ void BlindAccessory::moveBlindToTargetTask(void * instance)
 
 bool BlindAccessory::targetPositionReached(bool movingUp)
 {
-    ESP_LOGI(TAG, "targetPositionReached called, movingUp: %d, current: %d, target: %d", movingUp, m_blindPosition,
+    ESP_LOGD(TAG, "targetPositionReached called, movingUp: %d, current: %d, target: %d", movingUp, m_blindPosition,
              m_targetPosition);
     if (movingUp)
     {
@@ -218,5 +224,6 @@ bool BlindAccessory::targetPositionReached(bool movingUp)
 void BlindAccessory::setDefaultPosition(uint8_t defaultPosition)
 {
     ESP_LOGI(TAG, "setDefaultPosition called with defaultPosition: %d", defaultPosition);
-    m_blindPosition = defaultPosition;
+    m_blindPosition  = defaultPosition;
+    m_targetPosition = defaultPosition;
 }
