@@ -9,8 +9,7 @@ BlindAccessory::BlindAccessory(RelayModuleInterface * motorUp, RelayModuleInterf
     m_timeToClose(timeToClose), m_blindPosition(0), m_targetPosition(0), m_moveBlindTaskHandle(nullptr), m_reportCallback(nullptr),
     m_reportCallbackParam(nullptr)
 {
-    ESP_LOGI(TAG, "Creating BlindAccessory with timeToOpen: %d, timeToClose: %d", motorUp, motorDown, buttonUp, buttonDown,
-             timeToOpen, timeToClose);
+    ESP_LOGI(TAG, "Creating BlindAccessory with timeToOpen: %d, timeToClose: %d", timeToOpen, timeToClose);
 
     m_buttonUp->setSinglePressCallback(buttonUpCallback, this);
     m_buttonDown->setSinglePressCallback(buttonDownCallback, this);
@@ -39,7 +38,8 @@ void BlindAccessory::moveBlindTo(uint8_t newPosition)
     }
 
     m_targetPosition = newPosition;
-    xTaskCreate(moveBlindToTargetTask, "moveBlindToTask", 2048, this, 1, &m_moveBlindTaskHandle);
+    xTaskCreate(moveBlindToTargetTask, "moveBlindToTask", CONFIG_A_M_BLIND_ACCESSORY_MOVING_STACK_SIZE, this,
+                CONFIG_A_M_BLIND_ACCESSORY_MOVING_PRIORITY, &m_moveBlindTaskHandle);
 }
 
 uint8_t BlindAccessory::getCurrentPosition()
@@ -90,7 +90,7 @@ void BlindAccessory::identify()
             ESP_LOGD(TAG, "Identification sequence complete");
             vTaskDelete(nullptr);
         },
-        "identify", 2048, this, 5, nullptr);
+        "identify", CONFIG_A_M_BLIND_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_BLIND_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
 }
 
 void BlindAccessory::buttonDownCallback(void * instance)

@@ -78,7 +78,7 @@ void SwitchAccessory::identify()
             ESP_LOGD(TAG, "Identification sequence complete");
             vTaskDelete(nullptr);
         },
-        "identify", 2048, this, 5, nullptr);
+        "identify", CONFIG_A_M_SWITCH_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_SWITCH_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
 }
 
 void SwitchAccessory::buttonCallback(void * instance)

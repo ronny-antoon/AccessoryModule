@@ -78,7 +78,7 @@ void LightAccessory::identify()
             ESP_LOGD(TAG, "Identification sequence complete");
             vTaskDelete(nullptr);
         },
-        "identify", 2048, this, 5, nullptr);
+        "identify", CONFIG_A_M_LIGHT_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_LIGHT_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
 }
 
 void LightAccessory::buttonCallback(void * instance)

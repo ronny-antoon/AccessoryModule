@@ -66,7 +66,7 @@ void DoorLockAccessory::identify()
             ESP_LOGD(TAG, "Identification sequence complete");
             vTaskDelete(nullptr);
         },
-        "identify", 2048, this, 5, nullptr);
+        "identify", CONFIG_A_M_DOOR_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_DOOR_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
 }
 
 void DoorLockAccessory::buttonCallback(void * instance)
@@ -86,14 +86,16 @@ void DoorLockAccessory::openDoor()
         {
             m_reportCallback(m_reportCallbackParam);
         }
-        xTaskCreate(openDoorTask, "openDoor", 2048, this, 5, &m_openDoorTaskHandle);
+        xTaskCreate(openDoorTask, "openDoor", CONFIG_A_M_DOOR_ACCESSORY_OPENING_STACK_SIZE, this,
+                    CONFIG_A_M_DOOR_ACCESSORY_OPENING_PRIORITY, &m_openDoorTaskHandle);
     }
     else if (getState() == DoorLockState::UNLOCKED && m_openDoorTaskHandle != nullptr)
     {
         vTaskDelete(m_openDoorTaskHandle);
         m_openDoorTaskHandle = nullptr;
         m_relayModule->setPower(true);
-        xTaskCreate(openDoorTask, "openDoor", 2048, this, 5, &m_openDoorTaskHandle);
+        xTaskCreate(openDoorTask, "openDoor", CONFIG_A_M_DOOR_ACCESSORY_OPENING_STACK_SIZE, this,
+                    CONFIG_A_M_DOOR_ACCESSORY_OPENING_PRIORITY, &m_openDoorTaskHandle);
     }
 }
 
