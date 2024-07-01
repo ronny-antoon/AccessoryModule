@@ -1,5 +1,4 @@
 #include "FanAccessory.hpp"
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -9,7 +8,10 @@ FanAccessory::FanAccessory(RelayModuleInterface * relayModule, ButtonModuleInter
     m_relayModule(relayModule), m_buttonModule(buttonModule)
 {
     ESP_LOGI(TAG, "FanAccessory created");
-    m_buttonModule->setSinglePressCallback(buttonCallback, this);
+    if (m_buttonModule)
+    {
+        m_buttonModule->setSinglePressCallback(buttonCallback, this);
+    }
 }
 
 FanAccessory::~FanAccessory()

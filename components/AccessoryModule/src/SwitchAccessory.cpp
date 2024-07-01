@@ -1,5 +1,4 @@
 #include "SwitchAccessory.hpp"
-
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -10,7 +9,10 @@ SwitchAccessory::SwitchAccessory(RelayModuleInterface * relayModule, ButtonModul
     m_relayModule(relayModule), m_buttonModule(buttonModule)
 {
     ESP_LOGI(TAG, "SwitchAccessory created");
-    m_buttonModule->setSinglePressCallback(buttonCallback, this);
+    if (m_buttonModule)
+    {
+        m_buttonModule->setSinglePressCallback(buttonCallback, this);
+    }
 }
 
 SwitchAccessory::~SwitchAccessory()

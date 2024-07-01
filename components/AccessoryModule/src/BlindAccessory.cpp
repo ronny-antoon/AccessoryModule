@@ -11,8 +11,14 @@ BlindAccessory::BlindAccessory(RelayModuleInterface * motorUp, RelayModuleInterf
 {
     ESP_LOGI(TAG, "Creating BlindAccessory with timeToOpen: %d, timeToClose: %d", timeToOpen, timeToClose);
 
-    m_buttonUp->setSinglePressCallback(buttonUpCallback, this);
-    m_buttonDown->setSinglePressCallback(buttonDownCallback, this);
+    if (m_buttonUp)
+    {
+        m_buttonUp->setSinglePressCallback(buttonUpCallback, this);
+    }
+    if (m_buttonDown)
+    {
+        m_buttonDown->setSinglePressCallback(buttonDownCallback, this);
+    }
 }
 
 BlindAccessory::~BlindAccessory()
@@ -76,23 +82,15 @@ void BlindAccessory::identify()
             ESP_LOGD(TAG, "Starting identification sequence");
 
             BlindAccessory * blindAccessory = static_cast<BlindAccessory *>(instance);
-            blindAccessory->m_motorUp->setPower(false);
-            blindAccessory->m_motorDown->setPower(false);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            blindAccessory->m_motorDown->setPower(false);
-            blindAccessory->m_motorUp->setPower(true);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            blindAccessory->m_motorUp->setPower(false);
-            blindAccessory->m_motorDown->setPower(true);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            blindAccessory->m_motorDown->setPower(false);
-            blindAccessory->m_motorUp->setPower(true);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            blindAccessory->m_motorUp->setPower(false);
-            blindAccessory->m_motorDown->setPower(true);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            blindAccessory->m_motorUp->setPower(false);
-            blindAccessory->m_motorDown->setPower(false);
+            blindAccessory->startMoveDown();
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            blindAccessory->startMoveUp();
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            blindAccessory->startMoveDown();
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            blindAccessory->startMoveUp();
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            blindAccessory->stopMove();
 
             ESP_LOGD(TAG, "Identification sequence complete");
             vTaskDelete(nullptr);
@@ -133,22 +131,40 @@ void BlindAccessory::buttonUpCallback(void * instance)
 void BlindAccessory::startMoveUp()
 {
     ESP_LOGI(TAG, "startMoveUp called");
-    m_motorDown->setPower(false);
-    m_motorUp->setPower(true);
+    if (m_motorDown)
+    {
+        m_motorDown->setPower(false);
+    }
+    if (m_motorUp)
+    {
+        m_motorUp->setPower(true);
+    }
 }
 
 void BlindAccessory::startMoveDown()
 {
     ESP_LOGI(TAG, "startMoveDown called");
-    m_motorUp->setPower(false);
-    m_motorDown->setPower(true);
+    if (m_motorUp)
+    {
+        m_motorUp->setPower(false);
+    }
+    if (m_motorDown)
+    {
+        m_motorDown->setPower(true);
+    }
 }
 
 void BlindAccessory::stopMove()
 {
     ESP_LOGI(TAG, "stopMove called");
-    m_motorUp->setPower(false);
-    m_motorDown->setPower(false);
+    if (m_motorUp)
+    {
+        m_motorUp->setPower(false);
+    }
+    if (m_motorDown)
+    {
+        m_motorDown->setPower(false);
+    }
 }
 
 void BlindAccessory::moveBlindToTargetTask(void * instance)

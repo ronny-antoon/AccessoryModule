@@ -1,5 +1,4 @@
 #include "PluginAccessory.hpp"
-
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -10,7 +9,10 @@ PluginAccessory::PluginAccessory(RelayModuleInterface * relayModuleInterface, Bu
     m_relayModuleInterface(relayModuleInterface), m_buttonModuleInterface(buttonModuleInterface)
 {
     ESP_LOGI(TAG, "PluginAccessory created");
-    m_buttonModuleInterface->setSinglePressCallback(buttonCallback, this);
+    if (m_buttonModuleInterface)
+    {
+        m_buttonModuleInterface->setSinglePressCallback(buttonCallback, this);
+    }
 }
 
 PluginAccessory::~PluginAccessory()

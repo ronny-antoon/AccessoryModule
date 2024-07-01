@@ -1,5 +1,4 @@
 #include "LightAccessory.hpp"
-
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -10,7 +9,10 @@ LightAccessory::LightAccessory(RelayModuleInterface * relayModule, ButtonModuleI
     m_relayModule(relayModule), m_buttonModule(buttonModule)
 {
     ESP_LOGI(TAG, "LightAccessory created");
-    m_buttonModule->setSinglePressCallback(buttonCallback, this);
+    if (m_buttonModule)
+    {
+        m_buttonModule->setSinglePressCallback(buttonCallback, this);
+    }
 }
 
 LightAccessory::~LightAccessory()

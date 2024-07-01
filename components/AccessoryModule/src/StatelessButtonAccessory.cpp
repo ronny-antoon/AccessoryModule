@@ -1,5 +1,4 @@
 #include "StatelessButtonAccessory.hpp"
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -10,23 +9,26 @@ StatelessButtonAccessory::StatelessButtonAccessory(ButtonModuleInterface * butto
 {
     ESP_LOGI(TAG, "StatelessButtonAccessory created");
 
-    m_buttonModule->setSinglePressCallback(
-        [](void * instance) {
-            handlePress(instance, StatelessButtonAccessoryInterface::PressType::SinglePress, "Single press detected");
-        },
-        this);
+    if (m_buttonModule)
+    {
+        m_buttonModule->setSinglePressCallback(
+            [](void * instance) {
+                handlePress(instance, StatelessButtonAccessoryInterface::PressType::SinglePress, "Single press detected");
+            },
+            this);
 
-    m_buttonModule->setDoublePressCallback(
-        [](void * instance) {
-            handlePress(instance, StatelessButtonAccessoryInterface::PressType::DoublePress, "Double press detected");
-        },
-        this);
+        m_buttonModule->setDoublePressCallback(
+            [](void * instance) {
+                handlePress(instance, StatelessButtonAccessoryInterface::PressType::DoublePress, "Double press detected");
+            },
+            this);
 
-    m_buttonModule->setLongPressCallback(
-        [](void * instance) {
-            handlePress(instance, StatelessButtonAccessoryInterface::PressType::LongPress, "Long press detected");
-        },
-        this);
+        m_buttonModule->setLongPressCallback(
+            [](void * instance) {
+                handlePress(instance, StatelessButtonAccessoryInterface::PressType::LongPress, "Long press detected");
+            },
+            this);
+    }
 }
 
 StatelessButtonAccessory::~StatelessButtonAccessory()
