@@ -18,6 +18,13 @@ BlindAccessory::BlindAccessory(RelayModuleInterface * motorUp, RelayModuleInterf
 BlindAccessory::~BlindAccessory()
 {
     ESP_LOGI(TAG, "Destroying BlindAccessory");
+
+    if (m_moveBlindTaskHandle)
+    {
+        ESP_LOGI(TAG, "Deleting existing moveBlindTask");
+        vTaskDelete(m_moveBlindTaskHandle);
+        m_moveBlindTaskHandle = nullptr;
+    }
 }
 
 void BlindAccessory::moveBlindTo(uint8_t newPosition)
@@ -44,13 +51,13 @@ void BlindAccessory::moveBlindTo(uint8_t newPosition)
 
 uint8_t BlindAccessory::getCurrentPosition()
 {
-    ESP_LOGI(TAG, "getCurrentPosition called, returning: %d", m_blindPosition);
+    ESP_LOGD(TAG, "getCurrentPosition called, returning: %d", m_blindPosition);
     return m_blindPosition;
 }
 
 uint8_t BlindAccessory::getTargetPosition()
 {
-    ESP_LOGI(TAG, "getTargetPosition called, returning: %d", m_targetPosition);
+    ESP_LOGD(TAG, "getTargetPosition called, returning: %d", m_targetPosition);
     return m_targetPosition;
 }
 

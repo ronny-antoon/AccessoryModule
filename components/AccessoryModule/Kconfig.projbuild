@@ -2,7 +2,7 @@ menu "Accessory Module"
     menu "Blind Accessory"
         config A_M_BLIND_ACCESSORY_MOVING_STACK_SIZE
             int "Blind Accessory Moving Task Stack Size"
-            default 4096
+            default 2600
             range 1024 16384
 
         config A_M_BLIND_ACCESSORY_MOVING_PRIORITY
@@ -12,7 +12,7 @@ menu "Accessory Module"
 
         config A_M_BLIND_ACCESSORY_IDENTIFY_STACK_SIZE
             int "Blind Accessory Identify Task Stack Size"
-            default 4096
+            default 2600
             range 1024 16384
         
         config A_M_BLIND_ACCESSORY_IDENTIFY_PRIORITY
@@ -24,7 +24,7 @@ menu "Accessory Module"
     menu "Door Accessory"
       config A_M_DOOR_ACCESSORY_OPENING_STACK_SIZE
           int "Door Accessory Opening Task Stack Size"
-          default 4096
+          default 2600
           range 1024 16384
 
       config A_M_DOOR_ACCESSORY_OPENING_PRIORITY
@@ -34,7 +34,7 @@ menu "Accessory Module"
 
       config A_M_DOOR_ACCESSORY_IDENTIFY_STACK_SIZE
           int "Door Accessory Identify Task Stack Size"
-          default 4096
+          default 2600
           range 1024 16384
       
       config A_M_DOOR_ACCESSORY_IDENTIFY_PRIORITY
@@ -46,7 +46,7 @@ menu "Accessory Module"
     menu "Fan Accessory"
       config A_M_FAN_ACCESSORY_IDENTIFY_STACK_SIZE
         int "Fan Accessory Identify Task Stack Size"
-        default 4096
+        default 2600
         range 1024 16384
     
       config A_M_FAN_ACCESSORY_IDENTIFY_PRIORITY
@@ -58,7 +58,7 @@ menu "Accessory Module"
     menu "Light Accessory"
       config A_M_LIGHT_ACCESSORY_IDENTIFY_STACK_SIZE
         int "Light Accessory Identify Task Stack Size"
-        default 4096
+        default 2600
         range 1024 16384
     
       config A_M_LIGHT_ACCESSORY_IDENTIFY_PRIORITY
@@ -70,7 +70,7 @@ menu "Accessory Module"
     menu "Plugin Accessory"
       config A_M_PLUGIN_ACCESSORY_IDENTIFY_STACK_SIZE
         int "Plugin Accessory Identify Task Stack Size"
-        default 4096
+        default 2600
         range 1024 16384
     
       config A_M_PLUGIN_ACCESSORY_IDENTIFY_PRIORITY
@@ -82,7 +82,7 @@ menu "Accessory Module"
     menu "Switch Accessory"
       config A_M_SWITCH_ACCESSORY_IDENTIFY_STACK_SIZE
         int "Switch Accessory Identify Task Stack Size"
-        default 4096
+        default 2600
         range 1024 16384
     
       config A_M_SWITCH_ACCESSORY_IDENTIFY_PRIORITY
