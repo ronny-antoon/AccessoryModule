@@ -63,6 +63,6 @@ void StatelessButtonAccessory::handlePress(void * instance, StatelessButtonAcces
     ESP_LOGI(TAG, "%s", logMessage);
     if (statelessButtonAccessory->m_reportCallback)
     {
-        statelessButtonAccessory->m_reportCallback(statelessButtonAccessory->m_reportCallbackParam);
+        statelessButtonAccessory->m_reportCallback(statelessButtonAccessory->m_reportCallbackParam, false);
     }
 }

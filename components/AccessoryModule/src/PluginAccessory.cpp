@@ -93,6 +93,6 @@ void PluginAccessory::buttonCallback(void * instance)
     if (pluginAccessory->m_reportCallback)
     {
         ESP_LOGD(TAG, "Invoking report callback");
-        pluginAccessory->m_reportCallback(pluginAccessory->m_reportCallbackParam);
+        pluginAccessory->m_reportCallback(pluginAccessory->m_reportCallbackParam, false);
     }
 }

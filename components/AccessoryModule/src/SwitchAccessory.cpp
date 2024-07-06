@@ -93,6 +93,6 @@ void SwitchAccessory::buttonCallback(void * instance)
     if (switchAccessory->m_reportCallback)
     {
         ESP_LOGD(TAG, "Invoking report callback");
-        switchAccessory->m_reportCallback(switchAccessory->m_reportCallbackParam);
+        switchAccessory->m_reportCallback(switchAccessory->m_reportCallbackParam, false);
     }
 }

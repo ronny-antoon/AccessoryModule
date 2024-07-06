@@ -93,6 +93,6 @@ void LightAccessory::buttonCallback(void * instance)
     if (lightAccessory->m_reportCallback)
     {
         ESP_LOGD(TAG, "Invoking report callback");
-        lightAccessory->m_reportCallback(lightAccessory->m_reportCallbackParam);
+        lightAccessory->m_reportCallback(lightAccessory->m_reportCallbackParam, false);
     }
 }

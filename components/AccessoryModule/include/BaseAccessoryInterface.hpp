@@ -11,7 +11,7 @@ public:
      *
      * @param parameter Pointer to user-defined data.
      */
-    using ReportCallback = void (*)(void *);
+    using ReportCallback = void (*)(void *, bool onlySave);
 
     /**
      * @brief Type definition for any callback parameter type.

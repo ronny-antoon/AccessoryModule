@@ -178,7 +178,7 @@ void BlindAccessory::moveBlindToTargetTask(void * instance)
         blindAccessory->stopMove();
         if (blindAccessory->m_reportCallback)
         {
-            blindAccessory->m_reportCallback(blindAccessory->m_reportCallbackParam);
+            blindAccessory->m_reportCallback(blindAccessory->m_reportCallbackParam, false);
         }
         blindAccessory->m_moveBlindTaskHandle = nullptr;
         vTaskDelete(nullptr);
@@ -210,13 +210,23 @@ void BlindAccessory::moveBlindToTargetTask(void * instance)
     TickType_t xLastWakeTime    = xTaskGetTickCount();
     const TickType_t xFrequency = checkInterval / portTICK_PERIOD_MS;
 
+    bool firstRun = true;
+
     while (!blindAccessory->targetPositionReached(isMovingUp))
     {
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
         blindAccessory->m_blindPosition += isMovingUp ? 1 : -1;
         if (blindAccessory->m_reportCallback)
         {
-            blindAccessory->m_reportCallback(blindAccessory->m_reportCallbackParam);
+            if (firstRun)
+            {
+                firstRun = false;
+                blindAccessory->m_reportCallback(blindAccessory->m_reportCallbackParam, false);
+            }
+            else
+            {
+                blindAccessory->m_reportCallback(blindAccessory->m_reportCallbackParam, true);
+            }
         }
     }
 
@@ -224,7 +234,7 @@ void BlindAccessory::moveBlindToTargetTask(void * instance)
     ESP_LOGI(TAG, "Blind reached the target position: %d", blindAccessory->m_targetPosition);
     if (blindAccessory->m_reportCallback)
     {
-        blindAccessory->m_reportCallback(blindAccessory->m_reportCallbackParam);
+        blindAccessory->m_reportCallback(blindAccessory->m_reportCallbackParam, false);
     }
     blindAccessory->m_moveBlindTaskHandle = nullptr;
     vTaskDelete(nullptr);

@@ -92,6 +92,6 @@ void FanAccessory::buttonCallback(void * instance)
     if (fanAccessory->m_reportCallback)
     {
         ESP_LOGD(TAG, "Invoking report callback");
-        fanAccessory->m_reportCallback(fanAccessory->m_reportCallbackParam);
+        fanAccessory->m_reportCallback(fanAccessory->m_reportCallbackParam, false);
     }
 }

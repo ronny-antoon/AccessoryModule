@@ -84,7 +84,7 @@ void DoorLockAccessory::openDoor()
         m_relayModule->setPower(true);
         if (m_reportCallback)
         {
-            m_reportCallback(m_reportCallbackParam);
+            m_reportCallback(m_reportCallbackParam, false);
         }
         xTaskCreate(openDoorTask, "openDoor", CONFIG_A_M_DOOR_ACCESSORY_OPENING_STACK_SIZE, this,
                     CONFIG_A_M_DOOR_ACCESSORY_OPENING_PRIORITY, &m_openDoorTaskHandle);
@@ -119,6 +119,6 @@ void DoorLockAccessory::closeDoor()
     m_relayModule->setPower(false);
     if (m_reportCallback)
     {
-        m_reportCallback(m_reportCallbackParam);
+        m_reportCallback(m_reportCallbackParam, false);
     }
 }
