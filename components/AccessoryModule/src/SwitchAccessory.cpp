@@ -6,7 +6,8 @@
 static const char * TAG = "SwitchAccessory";
 
 SwitchAccessory::SwitchAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule) :
-    m_relayModule(relayModule), m_buttonModule(buttonModule)
+    m_relayModule(relayModule), m_buttonModule(buttonModule), m_reportCallback(nullptr), m_reportCallbackParam(nullptr),
+    m_identifyHandler(nullptr)
 {
     ESP_LOGI(TAG, "SwitchAccessory created");
     if (m_buttonModule)
@@ -23,6 +24,12 @@ SwitchAccessory::~SwitchAccessory()
 void SwitchAccessory::setPower(bool power)
 {
     ESP_LOGI(TAG, "Setting power to %s", power ? "ON" : "OFF");
+    if (m_identifyHandler)
+    {
+        ESP_LOGW(TAG, "setPower called, but identify in progress");
+        return;
+    }
+
     if (m_relayModule)
     {
         m_relayModule->setPower(power);
@@ -58,29 +65,45 @@ void SwitchAccessory::setReportCallback(ReportCallback callback, CallbackParam *
 void SwitchAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying SwitchAccessory");
+
+    if (m_identifyHandler)
+    {
+        vTaskDelete(m_identifyHandler);
+        m_identifyHandler = nullptr;
+    }
+
+    if (!m_relayModule)
+    {
+        ESP_LOGW(TAG, "identify called, but m_relayModule is nullptr");
+        return;
+    }
+
     xTaskCreate(
         [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
             SwitchAccessory * switchAccessory = static_cast<SwitchAccessory *>(instance);
 
-            switchAccessory->setPower(false);
+            switchAccessory->m_relayModule->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            switchAccessory->setPower(true);
+            switchAccessory->m_relayModule->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            switchAccessory->setPower(false);
+            switchAccessory->m_relayModule->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            switchAccessory->setPower(true);
+            switchAccessory->m_relayModule->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            switchAccessory->setPower(false);
+            switchAccessory->m_relayModule->setPower(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
+
+            switchAccessory->m_identifyHandler = nullptr;
             vTaskDelete(nullptr);
         },
-        "identify", CONFIG_A_M_SWITCH_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_SWITCH_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
+        "identify", CONFIG_A_M_SWITCH_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_SWITCH_ACCESSORY_IDENTIFY_PRIORITY,
+        &m_identifyHandler);
 }
 
 void SwitchAccessory::buttonCallback(void * instance)

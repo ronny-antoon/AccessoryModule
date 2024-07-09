@@ -5,7 +5,7 @@
 static const char * TAG = "StatelessButtonAccessory";
 
 StatelessButtonAccessory::StatelessButtonAccessory(ButtonModuleInterface * buttonModule) :
-    m_buttonModule(buttonModule), m_lastPressType(SinglePress)
+    m_buttonModule(buttonModule), m_lastPressType(SinglePress), m_reportCallback(nullptr), m_reportCallbackParam(nullptr)
 {
     ESP_LOGI(TAG, "StatelessButtonAccessory created");
 

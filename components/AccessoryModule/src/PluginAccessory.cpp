@@ -6,7 +6,8 @@
 static const char * TAG = "PluginAccessory";
 
 PluginAccessory::PluginAccessory(RelayModuleInterface * relayModuleInterface, ButtonModuleInterface * buttonModuleInterface) :
-    m_relayModuleInterface(relayModuleInterface), m_buttonModuleInterface(buttonModuleInterface)
+    m_relayModuleInterface(relayModuleInterface), m_buttonModuleInterface(buttonModuleInterface), m_reportCallback(nullptr),
+    m_reportCallbackParam(nullptr), m_identifyHandler(nullptr)
 {
     ESP_LOGI(TAG, "PluginAccessory created");
     if (m_buttonModuleInterface)
@@ -23,6 +24,11 @@ PluginAccessory::~PluginAccessory()
 void PluginAccessory::setPower(bool power)
 {
     ESP_LOGI(TAG, "Setting power to %s", power ? "ON" : "OFF");
+    if (m_identifyHandler)
+    {
+        ESP_LOGW(TAG, "setPower called, but identify in progress");
+        return;
+    }
     if (m_relayModuleInterface)
     {
         m_relayModuleInterface->setPower(power);
@@ -58,29 +64,45 @@ void PluginAccessory::setReportCallback(ReportCallback callback, CallbackParam *
 void PluginAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying PluginAccessory");
+
+    if (m_identifyHandler)
+    {
+        ESP_LOGW(TAG, "Identify task already running");
+        return;
+    }
+
+    if (!m_relayModuleInterface)
+    {
+        ESP_LOGW(TAG, "Relay module not available, cannot identify");
+        return;
+    }
+
     xTaskCreate(
         [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
             PluginAccessory * pluginAccessory = static_cast<PluginAccessory *>(instance);
 
-            pluginAccessory->setPower(false);
+            pluginAccessory->m_relayModuleInterface->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            pluginAccessory->setPower(true);
+            pluginAccessory->m_relayModuleInterface->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            pluginAccessory->setPower(false);
+            pluginAccessory->m_relayModuleInterface->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            pluginAccessory->setPower(true);
+            pluginAccessory->m_relayModuleInterface->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            pluginAccessory->setPower(false);
+            pluginAccessory->m_relayModuleInterface->setPower(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
+
+            pluginAccessory->m_identifyHandler = nullptr;
             vTaskDelete(nullptr);
         },
-        "identify", CONFIG_A_M_PLUGIN_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_PLUGIN_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
+        "identify", CONFIG_A_M_PLUGIN_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_PLUGIN_ACCESSORY_IDENTIFY_PRIORITY,
+        &m_identifyHandler);
 }
 
 void PluginAccessory::buttonCallback(void * instance)

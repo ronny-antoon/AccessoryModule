@@ -64,6 +64,8 @@ private:
     ReportCallback m_reportCallback;       ///< Callback function for reporting.
     CallbackParam * m_reportCallbackParam; ///< Parameter for the callback function.
 
+    TaskHandle_t m_identifyHandler; ///< Task handler for the identify function.
+
     // Delete the copy constructor and assignment operator
     SwitchAccessory(const SwitchAccessory &)             = delete;
     SwitchAccessory & operator=(const SwitchAccessory &) = delete;

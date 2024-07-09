@@ -7,7 +7,7 @@ BlindAccessory::BlindAccessory(RelayModuleInterface * motorUp, RelayModuleInterf
                                ButtonModuleInterface * buttonDown, uint8_t timeToOpen, uint8_t timeToClose) :
     m_motorUp(motorUp), m_motorDown(motorDown), m_buttonUp(buttonUp), m_buttonDown(buttonDown), m_timeToOpen(timeToOpen),
     m_timeToClose(timeToClose), m_blindPosition(0), m_targetPosition(0), m_moveBlindTaskHandle(nullptr), m_reportCallback(nullptr),
-    m_reportCallbackParam(nullptr)
+    m_reportCallbackParam(nullptr), m_identifyHandler(nullptr)
 {
     ESP_LOGI(TAG, "Creating BlindAccessory with timeToOpen: %d, timeToClose: %d", timeToOpen, timeToClose);
 
@@ -36,6 +36,12 @@ BlindAccessory::~BlindAccessory()
 void BlindAccessory::moveBlindTo(uint8_t newPosition)
 {
     ESP_LOGI(TAG, "moveBlindTo called with newPosition: %d", newPosition);
+
+    if (m_identifyHandler)
+    {
+        ESP_LOGW(TAG, "setPower called, but identify in progress");
+        return;
+    }
 
     if (newPosition > 100)
     {
@@ -77,6 +83,13 @@ void BlindAccessory::setReportCallback(ReportCallback callback, CallbackParam * 
 void BlindAccessory::identify()
 {
     ESP_LOGI(TAG, "identify called");
+
+    if (m_identifyHandler)
+    {
+        ESP_LOGW(TAG, "Identify task already running");
+        return;
+    }
+
     xTaskCreate(
         [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
@@ -93,9 +106,12 @@ void BlindAccessory::identify()
             blindAccessory->stopMove();
 
             ESP_LOGD(TAG, "Identification sequence complete");
+
+            blindAccessory->m_identifyHandler = nullptr;
             vTaskDelete(nullptr);
         },
-        "identify", CONFIG_A_M_BLIND_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_BLIND_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
+        "identify", CONFIG_A_M_BLIND_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_BLIND_ACCESSORY_IDENTIFY_PRIORITY,
+        &m_identifyHandler);
 }
 
 void BlindAccessory::buttonDownCallback(void * instance)

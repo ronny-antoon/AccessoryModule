@@ -5,7 +5,8 @@
 static const char * TAG = "FanAccessory";
 
 FanAccessory::FanAccessory(RelayModuleInterface * relayModule, ButtonModuleInterface * buttonModule) :
-    m_relayModule(relayModule), m_buttonModule(buttonModule)
+    m_relayModule(relayModule), m_buttonModule(buttonModule), m_reportCallback(nullptr), m_reportCallbackParam(nullptr),
+    m_identifyHandler(nullptr)
 {
     ESP_LOGI(TAG, "FanAccessory created");
     if (m_buttonModule)
@@ -22,6 +23,12 @@ FanAccessory::~FanAccessory()
 void FanAccessory::setPower(bool power)
 {
     ESP_LOGI(TAG, "Setting power to %s", power ? "ON" : "OFF");
+    if (m_identifyHandler)
+    {
+        ESP_LOGW(TAG, "setPower called, but identify in progress");
+        return;
+    }
+
     if (m_relayModule)
     {
         m_relayModule->setPower(power);
@@ -57,29 +64,45 @@ void FanAccessory::setReportCallback(ReportCallback callback, CallbackParam * ca
 void FanAccessory::identify()
 {
     ESP_LOGI(TAG, "Identifying FanAccessory");
+
+    if (m_identifyHandler)
+    {
+        ESP_LOGW(TAG, "Identification sequence already running");
+        return;
+    }
+
+    if (!m_relayModule)
+    {
+        ESP_LOGW(TAG, "Relay module not set, cannot identify");
+        return;
+    }
+
     xTaskCreate(
         [](void * instance) {
             ESP_LOGD(TAG, "Starting identification sequence");
             FanAccessory * fanAccessory = static_cast<FanAccessory *>(instance);
 
-            fanAccessory->setPower(false);
+            fanAccessory->m_relayModule->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            fanAccessory->setPower(true);
+            fanAccessory->m_relayModule->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            fanAccessory->setPower(false);
+            fanAccessory->m_relayModule->setPower(false);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            fanAccessory->setPower(true);
+            fanAccessory->m_relayModule->setPower(true);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-            fanAccessory->setPower(false);
+            fanAccessory->m_relayModule->setPower(false);
 
             ESP_LOGD(TAG, "Identification sequence complete");
+
+            fanAccessory->m_identifyHandler = nullptr;
             vTaskDelete(nullptr);
         },
-        "identify", CONFIG_A_M_FAN_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_FAN_ACCESSORY_IDENTIFY_PRIORITY, nullptr);
+        "identify", CONFIG_A_M_FAN_ACCESSORY_IDENTIFY_STACK_SIZE, this, CONFIG_A_M_FAN_ACCESSORY_IDENTIFY_PRIORITY,
+        &m_identifyHandler);
 }
 
 void FanAccessory::buttonCallback(void * instance)

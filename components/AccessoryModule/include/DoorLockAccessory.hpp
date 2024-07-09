@@ -75,6 +75,8 @@ private:
     ReportCallback m_reportCallback;       ///< Callback function for reporting attributes.
     CallbackParam * m_reportCallbackParam; ///< Parameter to be passed to the callback function.
 
+    TaskHandle_t m_identifyHandler; ///< Task handler for the identify function.
+
     // Delete copy constructor and assignment operator
     DoorLockAccessory(const DoorLockAccessory &)             = delete;
     DoorLockAccessory & operator=(const DoorLockAccessory &) = delete;
