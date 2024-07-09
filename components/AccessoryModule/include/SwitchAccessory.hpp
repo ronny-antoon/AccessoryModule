@@ -1,8 +1,11 @@
 #pragma once
 
 #include "SwitchAccessoryInterface.hpp"
+
 #include <ButtonModuleInterface.hpp>
 #include <RelayModuleInterface.hpp>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 /**
  * @brief Class representing a switch accessory.

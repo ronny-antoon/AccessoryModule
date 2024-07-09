@@ -1,5 +1,7 @@
 #pragma once
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <ButtonModuleInterface.hpp>
 #include <RelayModuleInterface.hpp>
 

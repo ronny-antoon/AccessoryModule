@@ -1,6 +1,9 @@
 #pragma once
 
 #include "FanAccessoryInterface.hpp"
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <ButtonModuleInterface.hpp>
 #include <RelayModuleInterface.hpp>
 #include <esp_log.h>
