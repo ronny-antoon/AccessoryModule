@@ -19,6 +19,12 @@ LightAccessory::LightAccessory(RelayModuleInterface * relayModule, ButtonModuleI
 LightAccessory::~LightAccessory()
 {
     ESP_LOGI(TAG, "LightAccessory destroyed");
+
+    if (m_identifyHandler)
+    {
+        vTaskDelete(m_identifyHandler);
+        m_identifyHandler = nullptr;
+    }
 }
 
 void LightAccessory::setPowerState(bool powerState)
